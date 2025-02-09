@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+const primaryColor = Color(0xFF91A287);
+const secondaryColor = Color(0xFFcbb89d);
+const tertiaryColor = Color(0xA1A79E);
 
 void main() {
   runApp(const MyApp());
@@ -28,6 +31,7 @@ class HomePage extends StatelessWidget {
       length: 2,
       child: Scaffold(
         appBar: AppBar(
+          backgroundColor: primaryColor,
           centerTitle: true,
           leading: Builder(
             builder: (context) {
@@ -59,7 +63,7 @@ class HomePage extends StatelessWidget {
             children: <Widget>[
               DrawerHeader(
                 decoration: BoxDecoration(
-                  color: Colors.blue,
+                  color: tertiaryColor,
                 ),
                 child: Text('Ecotracker'),
               ),
