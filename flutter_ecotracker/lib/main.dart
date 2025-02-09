@@ -23,10 +23,11 @@ class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      
       appBar: AppBar(
       centerTitle: true,
       leading: IconButton(
-        icon: Icon(Icons.add_circle),
+        icon: Icon(Icons.account_circle),
         onPressed: () {
         Navigator.push(
           context,
@@ -36,7 +37,27 @@ class HomePage extends StatelessWidget {
       ),
       title: const Text('Ecotracker'),
       ),
-       body: NavigatorWidget(),
+      
+      bottomNavigationBar: BottomNavigationBar(
+        items: const <BottomNavigationBarItem>[
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home),
+            label: 'Home',
+            
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.add_circle),
+            label: 'post',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.person),
+            label: 'notifications',
+          ),
+        ],
+      ),
+      body: NavigatorWidget(),
+
+      
     );
   }
 }
@@ -67,16 +88,41 @@ class NavigatorWidget extends StatelessWidget {
 class Page1 extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: ElevatedButton(
-        onPressed: () {
-          Navigator.of(context).pushNamed('/page2');
-        },
-        child: Text("Go to Page 2"),
-      ),
+    return Column(
+      children: <Widget>[
+        Container(
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              
+              FilledButton.tonal(
+                onPressed: () {
+                  Navigator.of(context).pushNamed('/page2');
+                },
+                child: Text("For you"),
+              ),
+              
+              FilledButton.tonal(
+                onPressed: () {
+                  Navigator.of(context).pushNamed('/page2');
+                },
+                child: Text("Events"),
+              ),
+              
+            ],
+          ),
+        ),
+       
+        Text('Page 1 Content'),
+        Text('Page 1 Content'),
+        Text('Page 1 Content'),
+        Text('Page 1 Content'),
+      ],
     );
+    }
   }
-}
+
 
 class Page2 extends StatelessWidget {
   @override
@@ -116,6 +162,21 @@ class ProfilePage extends StatelessWidget {
       ),
       body: Center(
         child: Text('Profile Content'),
+      ),
+    );
+  }
+}
+
+class NotificationsPage extends StatelessWidget {
+  const NotificationsPage({super.key});
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Notifications'),
+      ),
+      body: Center(
+        child: Text('Notifications Content'),
       ),
     );
   }
