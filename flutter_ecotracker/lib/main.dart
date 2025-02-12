@@ -45,6 +45,9 @@ class HomePage extends StatelessWidget {
           ),
           title: const Text('Ecotracker'),
           bottom: TabBar(
+            dividerHeight: 1.5,
+            labelColor: Colors.white,
+            indicatorColor: Colors.white,
             tabs: [
               Tab(text: 'For you'),
               Tab(text: 'Events'),
@@ -89,6 +92,9 @@ class HomePage extends StatelessWidget {
           ),
         ),
         bottomNavigationBar: BottomNavigationBar(
+          backgroundColor: primaryColor,
+          selectedItemColor: Colors.black,
+          unselectedItemColor: Colors.white,
           items: const <BottomNavigationBarItem>[
             BottomNavigationBarItem(
               icon: Icon(Icons.home),
