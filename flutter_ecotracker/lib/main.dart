@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'nearyou_page.dart';
+
 const primaryColor = Color(0xFF91A287);
 const secondaryColor = Color(0xFFcbb89d);
 const tertiaryColor = Color(0xA1A79E);
@@ -56,8 +58,8 @@ class HomePage extends StatelessWidget {
         ),
         body: TabBarView(
           children: [
-            Page1(),
-            Page2(),
+            NearyouPage(),
+            // Add another page for the 'Events' tab if needed
           ],
         ),
         drawer: Drawer(
@@ -111,82 +113,6 @@ class HomePage extends StatelessWidget {
           ],
         ),
       ),
-    );
-  }
-}
-
-class Page1 extends StatelessWidget {
-  const Page1({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return ListView.builder(
-      itemCount: 5,
-      itemBuilder: (context, index) {
-        return Card(
-          margin: EdgeInsets.all(10),
-          child: Padding(
-            padding: const EdgeInsets.all(10.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                Row(
-                  children: <Widget>[
-                    CircleAvatar(
-                      backgroundImage: AssetImage('assets/profile_picture.png'),
-                    ),
-                    SizedBox(width: 10),
-                    Text('User Name'),
-                  ],
-                ),
-                SizedBox(height: 10),
-                Text('This is a sample blog post content. It can be a few lines long.'),
-                SizedBox(height: 10),
-                Image.asset('assets/sample_image.png'),
-                SizedBox(height: 10),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: <Widget>[
-                    Row(
-                      children: <Widget>[
-                        Icon(Icons.thumb_up),
-                        SizedBox(width: 5),
-                        Text('Like'),
-                      ],
-                    ),
-                    Row(
-                      children: <Widget>[
-                        Icon(Icons.comment),
-                        SizedBox(width: 5),
-                        Text('Comment'),
-                      ],
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-        );
-      },
-    );
-  }
-}
-
-class Page2 extends StatelessWidget {
-  const Page2({super.key});
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: <Widget>[
-        Text('Page 2 Content'),
-        Text('Page 2 Content'),
-        Text('Page 2 Content'),
-        Text('Page 2 Content'),
-        Text('Page 2 Content'),
-        Text('Page 2 Content'),
-        Text('Page 2 Content'),
-        Text('Page 2 Content'),
-      ],
     );
   }
 }
