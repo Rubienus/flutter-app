@@ -1,15 +1,30 @@
 import 'package:flutter/material.dart';
 
-class NearyouPage extends StatelessWidget {
+class NearyouPage extends StatefulWidget {
   const NearyouPage({super.key});
 
   @override
+  _NearyouPageState createState() => _NearyouPageState();
+}
+
+class _NearyouPageState extends State<NearyouPage> {
+  static const int itemCount = 5;
+  List<bool> liked = List<bool>.generate(itemCount, (index) => false);
+
+  @override
+  void initState() {
+    super.initState();
+    liked = List<bool>.generate(itemCount, (index) => false);
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return ListView.builder(
-      itemCount: 5,
+    return ListView.separated(
+      itemCount: itemCount,
+      separatorBuilder: (context, index) => Divider(),
       itemBuilder: (context, index) {
-        return Card(
-          margin: EdgeInsets.all(10),
+        return Container(
+          margin: const EdgeInsets.all(10),
           child: Padding(
             padding: const EdgeInsets.all(10.0),
             child: Column(
@@ -20,13 +35,13 @@ class NearyouPage extends StatelessWidget {
                     CircleAvatar(
                       backgroundImage: AssetImage('assets/profile_picture.png'),
                     ),
-                    SizedBox(width: 10),
+                    const SizedBox(width: 10),
                     Text('User Name'),
                   ],
                 ),
-                SizedBox(height: 10),
+                const SizedBox(height: 10),
                 Text('This is a sample blog post content. It can be a few lines long.'),
-                SizedBox(height: 10),
+                const SizedBox(height: 10),
                 Image.asset('assets/sample_image.png'),
                 SizedBox(height: 10),
                 Row(
@@ -34,8 +49,18 @@ class NearyouPage extends StatelessWidget {
                   children: <Widget>[
                     Row(
                       children: <Widget>[
-                        Icon(Icons.thumb_up),
-                        SizedBox(width: 5),
+                        IconButton(
+                          icon: Icon(
+                            Icons.thumb_up,
+                            color: liked[index] ? Colors.blue : Colors.grey,
+                          ),
+                          onPressed: () {
+                            setState(() {
+                              liked[index] = !liked[index];
+                            });
+                          },
+                        ),
+                        const SizedBox(width: 5),
                         Text('Like'),
                       ],
                     ),
