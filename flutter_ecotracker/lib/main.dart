@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'nearyou_page.dart';
+import 'events_page.dart';
 
 const primaryColor = Color(0xFF91A287);
 const secondaryColor = Color(0xFFcbb89d);
@@ -59,7 +60,7 @@ class HomePage extends StatelessWidget {
         body: TabBarView(
           children: [
             NearyouPage(),
-            // Add another page for the 'Events' tab if needed
+            EventsPage(),
           ],
         ),
         drawer: Drawer(
