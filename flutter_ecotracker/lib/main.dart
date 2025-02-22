@@ -7,7 +7,7 @@ import 'pages/coupons_page.dart';
 
 const primaryColor = Color(0xFF91A287);
 const secondaryColor = Color(0xFFcbb89d);
-const tertiaryColor = Color(0xA1A79E);
+const tertiaryColor = Color(0xFFA1A79E);
 
 void main() {
   runApp(const MyApp());
@@ -21,7 +21,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Eco Tracker',
       theme: ThemeData(
-        primarySwatch: Colors.blue,
+        primaryColor: primaryColor,
       ),
       home: const HomePage(),
     );
@@ -96,6 +96,10 @@ class _HomePageState extends State<HomePage> {
                   MaterialPageRoute(builder: (context) => CouponsPage()),
                 );
               },
+            ),
+            ListTile(
+              title: Text('logout'),
+
             ),
           ],
         ),
