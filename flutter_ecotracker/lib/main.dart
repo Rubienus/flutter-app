@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'pages/nearyou_page.dart';
 import 'pages/events_page.dart';
 import 'pages/notifications_page.dart';
+import 'pages/profile_page.dart';
+import 'pages/coupons_page.dart';
 
 const primaryColor = Color(0xFF91A287);
 const secondaryColor = Color(0xFFcbb89d);
@@ -123,59 +125,4 @@ class _HomePageState extends State<HomePage> {
   }
 }
 
-class ProfilePage extends StatelessWidget {
-  const ProfilePage({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Profile'),
-      ),
-      body: Center(
-        child: Text('Profile Content'),
-      ),
-    );
-  }
-}
-
-class CouponsPage extends StatelessWidget {
-  const CouponsPage({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Coupons'),
-      ),
-      body: Center(
-        child: ListView(
-          children: ListTile.divideTiles(
-            context: context,
-            tiles: [
-              ListTile(
-                leading: Icon(Icons.food_bank),
-                title: Text('Coupons1'),
-                subtitle: Text('10pcs yumburger'),
-                trailing: Icon(Icons.arrow_forward_ios),
-              ),
-              ListTile(
-                leading: Icon(Icons.food_bank),
-                title: Text('Coupons2'),
-                subtitle: Text('10pcs yumburger'),
-                trailing: Icon(Icons.arrow_forward_ios),
-              ),
-              ListTile(
-                leading: Icon(Icons.food_bank),
-                title: Text('Coupons3'),
-                subtitle: Text('10pcs yumburger'),
-                trailing: Icon(Icons.arrow_forward_ios),
-              ),
-            ],
-          ).toList(),
-        ),
-      ),
-    );
-  }
-}
 
