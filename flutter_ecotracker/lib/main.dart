@@ -77,6 +77,9 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
         bottom: _selectedIndex == 0
             ? TabBar(
                 controller: _tabController,
+                dividerHeight: 1.5,
+                labelColor: Colors.white,
+                indicatorColor: Colors.white,
                 tabs: const [
                   Tab(text: 'Near You'),
                   Tab(text: 'Events'),
