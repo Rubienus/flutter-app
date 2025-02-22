@@ -27,7 +27,12 @@ class NearyouPage extends StatelessWidget {
                 SizedBox(height: 10),
                 Text('This is a sample blog post content. It can be a few lines long.'),
                 SizedBox(height: 10),
-                Image.asset('assets/sample_image.png'),
+                Image.asset(
+                  'images/sample.jpg',
+                  width: 50,
+                  height: 50,
+                  fit: BoxFit.cover,
+                ),
                 SizedBox(height: 10),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
