@@ -35,14 +35,21 @@ class HomePage extends StatefulWidget {
   _HomePageState createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin {
   int _selectedIndex = 0;
+  late TabController _tabController;
 
   static const List<Widget> _pages = <Widget>[
     NearyouPage(),
     EventsPage(),
     NotificationsPage(),
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    _tabController = TabController(length: 2, vsync: this);
+  }
 
   void _onItemTapped(int index) {
     setState(() {
@@ -67,8 +74,25 @@ class _HomePageState extends State<HomePage> {
           },
         ),
         title: const Text('Ecotracker'),
+        bottom: _selectedIndex == 0
+            ? TabBar(
+                controller: _tabController,
+                tabs: const [
+                  Tab(text: 'Near You'),
+                  Tab(text: 'Events'),
+                ],
+              )
+            : null,
       ),
-      body: _pages.elementAt(_selectedIndex),
+      body: _selectedIndex == 0
+          ? TabBarView(
+              controller: _tabController,
+              children: const [
+                NearyouPage(),
+                EventsPage(),
+              ],
+            )
+          : _pages.elementAt(_selectedIndex),
       drawer: Drawer(
         child: ListView(
           padding: EdgeInsets.zero,
@@ -77,7 +101,7 @@ class _HomePageState extends State<HomePage> {
               decoration: BoxDecoration(
                 color: tertiaryColor,
               ),
-              child: Text('Ecotracker'),
+              child: Text('Eco Tracker'),
             ),
             ListTile(
               title: Text('Profile'),
@@ -98,8 +122,7 @@ class _HomePageState extends State<HomePage> {
               },
             ),
             ListTile(
-              title: Text('logout'),
-
+              title: Text('Logout'),
             ),
           ],
         ),
@@ -128,5 +151,3 @@ class _HomePageState extends State<HomePage> {
     );
   }
 }
-
-

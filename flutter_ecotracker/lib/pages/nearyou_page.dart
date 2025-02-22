@@ -18,7 +18,7 @@ class NearyouPage extends StatelessWidget {
                 Row(
                   children: <Widget>[
                     CircleAvatar(
-                      backgroundImage: AssetImage('assets/profile_picture.png'),
+                      backgroundImage: AssetImage('profile_sample.jpg'),
                     ),
                     SizedBox(width: 10),
                     Text('User Name'),
@@ -29,8 +29,8 @@ class NearyouPage extends StatelessWidget {
                 SizedBox(height: 10),
                 Image.asset(
                   'images/sample.jpg',
-                  width: 50,
-                  height: 50,
+                  width: 100,
+                  height: 100,
                   fit: BoxFit.cover,
                 ),
                 SizedBox(height: 10),

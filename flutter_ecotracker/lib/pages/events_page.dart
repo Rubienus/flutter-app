@@ -18,7 +18,7 @@ class EventsPage extends StatelessWidget {
                 Row(
                   children: <Widget>[
                     CircleAvatar(
-                      backgroundImage: AssetImage('assets/profile_picture.png'),
+                      backgroundImage: AssetImage('profile_sample.jpg'),
                     ),
                     SizedBox(width: 10),
                     Text('User Name'),
