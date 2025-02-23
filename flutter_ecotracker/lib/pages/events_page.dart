@@ -9,9 +9,9 @@ class EventsPage extends StatefulWidget {
 }
 
 class _EventsPageState extends State<EventsPage> {
-  List<bool> liked = List<bool>.filled(5, false);
-  List<int> points = List<int>.generate(5, (index) => Random().nextInt(100) + 15);
   List<List<String>> images = List<List<String>>.generate(5, (index) => List<String>.generate(Random().nextInt(5) + 1, (i) => 'images/sample.jpg'));
+  List<int> points = List<int>.generate(5, (index) => Random().nextInt(100) + 15);
+  List<bool> liked = List<bool>.filled(5, false);
 
   @override
   Widget build(BuildContext context) {
