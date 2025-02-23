@@ -1,7 +1,14 @@
 import 'package:flutter/material.dart';
 
-class NearyouPage extends StatelessWidget {
+class NearyouPage extends StatefulWidget {
   const NearyouPage({super.key});
+
+  @override
+  _NearyouPageState createState() => _NearyouPageState();
+}
+
+class _NearyouPageState extends State<NearyouPage> {
+  List<bool> liked = List<bool>.filled(5, false);
 
   @override
   Widget build(BuildContext context) {
@@ -18,7 +25,7 @@ class NearyouPage extends StatelessWidget {
                 Row(
                   children: <Widget>[
                     CircleAvatar(
-                      backgroundImage: AssetImage('profile_sample.jpg'),
+                      backgroundImage: AssetImage('images/profile_sample.jpg'),
                     ),
                     SizedBox(width: 10),
                     Text('User Name'),
@@ -37,12 +44,22 @@ class NearyouPage extends StatelessWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: <Widget>[
-                    Row(
-                      children: <Widget>[
-                        Icon(Icons.thumb_up),
-                        SizedBox(width: 5),
-                        Text('Like'),
-                      ],
+                    InkWell(
+                      onTap: () {
+                        setState(() {
+                          liked[index] = !liked[index];
+                        });
+                      },
+                      child: Row(
+                        children: <Widget>[
+                          Icon(
+                            Icons.thumb_up,
+                            color: liked[index] ? Colors.blue : Colors.grey,
+                          ),
+                          SizedBox(width: 5),
+                          Text('Like'),
+                        ],
+                      ),
                     ),
                     Row(
                       children: <Widget>[

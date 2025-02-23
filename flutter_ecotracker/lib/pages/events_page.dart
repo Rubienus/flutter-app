@@ -1,7 +1,14 @@
 import 'package:flutter/material.dart';
 
-class EventsPage extends StatelessWidget {
+class EventsPage extends StatefulWidget {
   const EventsPage({super.key});
+
+  @override
+  _EventsPageState createState() => _EventsPageState();
+}
+
+class _EventsPageState extends State<EventsPage> {
+  List<bool> liked = List<bool>.filled(5, false);
 
   @override
   Widget build(BuildContext context) {
@@ -18,7 +25,7 @@ class EventsPage extends StatelessWidget {
                 Row(
                   children: <Widget>[
                     CircleAvatar(
-                      backgroundImage: AssetImage('profile_sample.jpg'),
+                      backgroundImage: AssetImage('images/profile_sample.jpg'),
                     ),
                     SizedBox(width: 10),
                     Text('User Name'),
@@ -27,17 +34,29 @@ class EventsPage extends StatelessWidget {
                 SizedBox(height: 10),
                 Text('This is a sample blog post content. It can be a few lines long.'),
                 SizedBox(height: 10),
-                Image.asset('images/sample.jpg'),
+                Image.asset(
+                  'images/sample.jpg',
+                ),
                 SizedBox(height: 10),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: <Widget>[
-                    Row(
-                      children: <Widget>[
-                        Icon(Icons.thumb_up),
-                        SizedBox(width: 5),
-                        Text('Like'),
-                      ],
+                    InkWell(
+                      onTap: () {
+                        setState(() {
+                          liked[index] = !liked[index];
+                        });
+                      },
+                      child: Row(
+                        children: <Widget>[
+                          Icon(
+                            Icons.thumb_up,
+                            color: liked[index] ? Colors.blue : Colors.grey,
+                          ),
+                          SizedBox(width: 5),
+                          Text('Like'),
+                        ],
+                      ),
                     ),
                     Row(
                       children: <Widget>[
