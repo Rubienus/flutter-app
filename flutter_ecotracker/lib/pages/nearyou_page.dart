@@ -1,3 +1,4 @@
+import 'dart:math';
 import 'package:flutter/material.dart';
 
 class NearyouPage extends StatefulWidget {
@@ -9,6 +10,8 @@ class NearyouPage extends StatefulWidget {
 
 class _NearyouPageState extends State<NearyouPage> {
   List<bool> liked = List<bool>.filled(5, false);
+  List<int> points = List<int>.generate(5, (index) => Random().nextInt(100) + 15);
+  List<List<String>> images = List<List<String>>.generate(5, (index) => List<String>.generate(Random().nextInt(5) + 1, (i) => 'images/sample.jpg'));
 
   @override
   Widget build(BuildContext context) {
@@ -33,12 +36,22 @@ class _NearyouPageState extends State<NearyouPage> {
                 ),
                 SizedBox(height: 10),
                 Text('This is a sample blog post content. It can be a few lines long.'),
+                Text('${points[index]} Ecopoints'),
                 SizedBox(height: 10),
-                Image.asset(
-                  'images/sample.jpg',
-                  width: 100,
-                  height: 100,
-                  fit: BoxFit.cover,
+                SizedBox(
+                  height: 200,
+                  child: ListView.builder(
+                    scrollDirection: Axis.horizontal,
+                    itemCount: images[index].length,
+                    itemBuilder: (context, imgIndex) {
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 5.0),
+                        child: Image.asset(
+                          images[index][imgIndex],
+                        ),
+                      );
+                    },
+                  ),
                 ),
                 SizedBox(height: 10),
                 Row(
