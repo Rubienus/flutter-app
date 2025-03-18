@@ -1,0 +1,41 @@
+{
+    "endpoints": {
+      "register": {
+        "method": "POST",
+        "url": "/script/api.php",
+        "request_body": {
+          "action": "register",
+          "email": "user@example.com",
+          "username": "username",
+          "password": "password123"
+        },
+        "response": {
+          "message": "User registered successfully"
+        }
+      },
+      "login": {
+        "method": "POST",
+        "url": "/script/api.php",
+        "request_body": {
+          "action": "login",
+          "username": "username",
+          "password": "password123"
+        },
+        "response": {
+          "message": "Login successful",
+          "api_id": "unique_api_id"
+        }
+      },
+      "get_user_details": {
+        "method": "GET",
+        "url": "/script/api.php?username=username",
+        "response": {
+          "id": 1,
+          "email": "user@example.com",
+          "username": "username",
+          "api_id": "unique_api_id"
+        }
+      }
+    }
+  }
+  

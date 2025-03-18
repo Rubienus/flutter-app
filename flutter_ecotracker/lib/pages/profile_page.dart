@@ -1,7 +1,19 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+
+Future<void> getUserDetails(String username) async {
+  final response = await http.get(
+    Uri.parse('https://just1ncantiler0.heliohost.us/Ecotracker_api/script/api.php?username=$username'),
+  );
+
+  final data = jsonDecode(response.body);
+  print(data);
+}
 
 class ProfilePage extends StatelessWidget {
   const ProfilePage({super.key});
+
 
   @override
   Widget build(BuildContext context) {

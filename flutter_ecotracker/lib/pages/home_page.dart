@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 import 'nearyou_page.dart';
 import 'events_page.dart';
 import 'notifications_page.dart';
@@ -11,7 +13,9 @@ const secondaryColor = Color(0xFFcbb89d);
 const tertiaryColor = Color(0xFFA1A79E);
 
 class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+  final String? apiId;
+
+  HomePage({this.apiId});
 
   @override
   _HomePageState createState() => _HomePageState();
@@ -20,6 +24,10 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin {
   int _selectedIndex = 0;
   late TabController _tabController;
+
+  String username = "Loading...";
+  String email = "Loading...";
+  bool isLoading = true;
 
   static const List<Widget> _pages = <Widget>[
     NearyouPage(),
@@ -31,6 +39,44 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
+    fetchUserData();
+  }
+
+  Future<void> fetchUserData() async {
+  final url = Uri.parse('https://just1ncantiler0.heliohost.us/Ecotracker_api/script/api.php?username=${widget.apiId}');
+
+    try {
+      final response = await http.get(
+        url,
+        headers: {"Authorization": widget.apiId ?? ''}, // API Key for validation
+      );
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        setState(() {
+          if (data.containsKey("message")) {
+            username = "User not found";
+            email = "Invalid API Key";
+          } else {
+            username = data['username'];
+            email = data['email'];
+          }
+          isLoading = false;
+        });
+      } else {
+        setState(() {
+          username = "Error fetching data";
+          email = "Check API key";
+          isLoading = false;
+        });
+      }
+    } catch (e) {
+      setState(() {
+        username = "Network error";
+        email = "Please try again";
+        isLoading = false;
+      });
+    }
   }
 
   void _onItemTapped(int index) {
@@ -69,15 +115,17 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
               )
             : null,
       ),
-      body: _selectedIndex == 0
-          ? TabBarView(
-              controller: _tabController,
-              children: const [
-                NearyouPage(),
-                EventsPage(),
-              ],
-            )
-          : _pages.elementAt(_selectedIndex),
+      body: isLoading
+          ? Center(child: CircularProgressIndicator())
+          : _selectedIndex == 0
+              ? TabBarView(
+                  controller: _tabController,
+                  children: const [
+                    NearyouPage(),
+                    EventsPage(),
+                  ],
+                )
+              : _pages.elementAt(_selectedIndex),
       drawer: Drawer(
         child: ListView(
           padding: EdgeInsets.zero,
@@ -86,7 +134,15 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
               decoration: BoxDecoration(
                 color: tertiaryColor,
               ),
-              child: Text('Eco Tracker'),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('Eco Tracker', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                  SizedBox(height: 10),
+                  Text('Welcome, $username', style: TextStyle(fontSize: 16)),
+                  Text('Email: $email', style: TextStyle(fontSize: 14)),
+                ],
+              ),
             ),
             ListTile(
               title: Text('Login'),

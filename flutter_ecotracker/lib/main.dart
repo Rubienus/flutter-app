@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'pages/home_page.dart';
 
+
 const primaryColor = Color(0xFF91A287);
 const secondaryColor = Color(0xFFcbb89d);
 const tertiaryColor = Color(0xFFA1A79E);
@@ -19,10 +20,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         colorScheme: ColorScheme.fromSwatch().copyWith(primary: primaryColor),
       ),
-      home: const HomePage(),
+      home: HomePage(), 
     );
   }
 }
-
-
-
