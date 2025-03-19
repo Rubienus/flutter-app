@@ -27,7 +27,7 @@ class _RegisterPageState extends State<RegisterPage> {
 
   print("API Response: $response"); // Debugging
 
-    if (response != null && response.containsKey("message") && response["message"] == "Registration successful") {
+if (response != null && response.containsKey("message") && response["message"].toLowerCase().contains("registered successfully")) {
       Navigator.pop(context); // Go back to login page
     } else {
       setState(() {

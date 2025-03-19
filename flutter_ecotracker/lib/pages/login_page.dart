@@ -19,7 +19,9 @@ class _LoginPageState extends State<LoginPage> {
       _passwordController.text,
     );
 
-    if (response != null && response.containsKey("message") && response["message"] == "Login successful") {
+print("API Response: $response"); // Debugging
+
+if (response != null && response.containsKey("message") && response["message"].toLowerCase().contains("login successful")) {
       Navigator.pushReplacement(
         context, 
         MaterialPageRoute(builder: (context) => HomePage()),
