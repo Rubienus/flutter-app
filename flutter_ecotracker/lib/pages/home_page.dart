@@ -7,6 +7,8 @@ import 'notifications_page.dart';
 import 'profile_page.dart';
 import 'coupons_page.dart';
 import 'login_page.dart';
+import 'createpost_page.dart';
+import '../api_service.dart';
 
 const primaryColor = Color(0xFF91A287);
 const secondaryColor = Color(0xFFcbb89d);
@@ -29,7 +31,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
   String email = "Loading...";
   bool isLoading = true;
 
-  static const List<Widget> _pages = <Widget>[
+  static List<Widget> _pages = <Widget>[
     NearyouPage(),
     EventsPage(),
     NotificationsPage(),
@@ -43,7 +45,8 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
   }
 
   Future<void> fetchUserData() async {
-  final url = Uri.parse('https://just1ncantiler0.heliohost.us/Ecotracker_api/script/api.php?username=${widget.apiId}');
+    final url = Uri.parse(
+        'https://just1ncantiler0.heliohost.us/Ecotracker_api/script/api.php?username=${widget.apiId}');
 
     try {
       final response = await http.get(
@@ -80,9 +83,17 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
   }
 
   void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
+    if (index == 1) {
+      // Navigate to CreatePostPage when clicking "Post"
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => CreatePostPage()),
+      );
+    } else {
+      setState(() {
+        _selectedIndex = index;
+      });
+    }
   }
 
   @override
@@ -120,7 +131,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
           : _selectedIndex == 0
               ? TabBarView(
                   controller: _tabController,
-                  children: const [
+                  children: [
                     NearyouPage(),
                     EventsPage(),
                   ],
@@ -137,7 +148,9 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('Eco Tracker', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                  Text('Eco Tracker',
+                      style:
+                          TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
                   SizedBox(height: 10),
                   Text('Welcome, $username', style: TextStyle(fontSize: 16)),
                   Text('Email: $email', style: TextStyle(fontSize: 14)),
@@ -173,6 +186,19 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
             ),
             ListTile(
               title: Text('Logout'),
+              onTap: () async {
+                bool success = await ApiService.logoutUser(widget.apiId ?? '');
+                if (success) {
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(builder: (context) => LoginPage()),
+                  );
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Logout failed, try again!')),
+                  );
+                }
+              },
             ),
           ],
         ),

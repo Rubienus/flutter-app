@@ -10,7 +10,7 @@ class NotificationsPage extends StatelessWidget {
         title: const Text('Notifications'),
       ),
       body: Center(
-        child: Text('Notifications Content'),
+        child: Text('You have no notifications as of now.'),
       ),
     );
   }

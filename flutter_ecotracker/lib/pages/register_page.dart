@@ -11,27 +11,52 @@ class _RegisterPageState extends State<RegisterPage> {
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   String? _errorMessage;
+  bool _isLoading = false; // Added loading state
 
   Future<void> _register() async {
- if (_emailController.text.isEmpty || _usernameController.text.isEmpty || _passwordController.text.isEmpty) {
-    setState(() {
-      _errorMessage = "All fields are required.";
-    });
-    return;
-  }
-      final response = await ApiService.registerUser(
-      _emailController.text,
-      _usernameController.text,
-      _passwordController.text,
-    );
+    print("Register button clicked"); // Debugging
 
-  print("API Response: $response"); // Debugging
-
-if (response != null && response.containsKey("message") && response["message"].toLowerCase().contains("registered successfully")) {
-      Navigator.pop(context); // Go back to login page
-    } else {
+    if (_emailController.text.isEmpty || _usernameController.text.isEmpty || _passwordController.text.isEmpty) {
       setState(() {
-        _errorMessage = response?["error"] ?? "Registration failed. Try again.";
+        _errorMessage = "All fields are required.";
+      });
+      return;
+    }
+
+    setState(() {
+      _isLoading = true;
+      _errorMessage = null;
+    });
+
+    try {
+      final response = await ApiService.registerUser(
+        _emailController.text,
+        _usernameController.text,
+        _passwordController.text,
+      );
+
+      print("API Response: $response"); // Debugging
+
+      if (response != null &&
+          response.containsKey("message") &&
+          response["message"].toLowerCase().contains("registered successfully")) {
+        print("Registration successful, navigating back.");
+        Navigator.pop(context); // Go back to login page
+      } else {
+        setState(() {
+          _errorMessage = response?["message"] ?? "Registration failed. Try again.";
+        });
+      }
+    } catch (e, stackTrace) {
+      print("Error during registration: $e"); // Debugging
+      print("Stack trace: $stackTrace");
+
+      setState(() {
+        _errorMessage = "Something went wrong: $e";
+      });
+    } finally {
+      setState(() {
+        _isLoading = false;
       });
     }
   }
@@ -59,12 +84,17 @@ if (response != null && response.containsKey("message") && response["message"].t
               obscureText: true,
             ),
             SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: _register,
-              child: Text("Register"),
-            ),
-            if (_errorMessage != null) 
-              Text(_errorMessage!, style: TextStyle(color: Colors.red)),
+            _isLoading
+                ? CircularProgressIndicator() // Show loading indicator
+                : ElevatedButton(
+                    onPressed: _register,
+                    child: Text("Register"),
+                  ),
+            if (_errorMessage != null)
+              Padding(
+                padding: EdgeInsets.only(top: 10),
+                child: Text(_errorMessage!, style: TextStyle(color: Colors.red)),
+              ),
           ],
         ),
       ),

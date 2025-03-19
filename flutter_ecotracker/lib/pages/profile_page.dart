@@ -63,8 +63,8 @@ class ProfilePage extends StatelessWidget {
               ),
               const SizedBox(height: 8),
               Text(
-                'Lorem ipsum dolor sit amet, consectetur adipiscing elit. '
-                'Vestibulum in neque et nisl. Nulla facilisi. '
+                'Hello guys! My name is John Doe and I am a ecolover. '
+                'This is my first account in ecotracker im so excited!. '
                 'Curabitur ac felis arcu. Sed vehicula, urna eget aliquam '
                 'feugiat, nisi libero ultricies nisi, vel tincidunt elit '
                 'nunc vel nisi.',
