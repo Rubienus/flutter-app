@@ -6,6 +6,7 @@ import 'dart:io';
 class ApiService {
   static const String baseUrl = "https://just1ncantiler0.heliohost.us/Ecotracker_api";
   static const String fetchUserUrl = "$baseUrl/api/microuser/crud/read.php";
+    static const String fetchPostUrl = "$baseUrl/api/posts/crud/read.php";
   static const String registerUrl = "$baseUrl/api/microuser/register.php";
   static const String loginUrl = "$baseUrl/api/microuser/login.php";
   static const String postUrl = "$baseUrl/api/posts/crud/create.php";
@@ -124,12 +125,6 @@ class ApiService {
       request.files.add(await http.MultipartFile.fromPath('image', image.path));
     }
 
-    // Debugging output before sending the request
-    print("Sending request with fields:");
-    print("User ID: $userId");
-    print("Text: $text");
-    print("Category: ${category.toString()}");
-
     var streamedResponse = await request.send();
     var response = await http.Response.fromStream(streamedResponse);
 
@@ -147,5 +142,34 @@ class ApiService {
   }
 }
 
+// Fetch Posts (GET)
+static Future<List<Map<String, dynamic>>?> fetchPosts({String? postId}) async {
+  try {
+    Uri url = postId != null 
+        ? Uri.parse('$fetchPostUrl?post_id=$postId') 
+        : Uri.parse(fetchPostUrl);
 
+    final response = await http.get(url);
+
+    if (response.statusCode == 200) {
+      dynamic data = jsonDecode(response.body);
+
+      // Check if response is a list (multiple posts) or a single post (map)
+      if (data is List) {
+        return data.cast<Map<String, dynamic>>();
+      } else if (data is Map<String, dynamic>) {
+        return [data]; // Wrap single post in a list
+      } else {
+        print('Unexpected response format');
+        return null;
+      }
+    } else {
+      print('Fetch Posts Error: ${response.body}');
+      return null;
+    }
+  } catch (e) {
+    print('Fetch Posts Exception: $e');
+    return null;
+  }
+}
 }

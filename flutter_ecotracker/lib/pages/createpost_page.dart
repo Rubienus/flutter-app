@@ -5,6 +5,8 @@ import 'package:image_picker/image_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../api_service.dart';
+import 'nearyou_page.dart';
+import 'events_page.dart';
 
 class CreatePostPage extends StatefulWidget {
   @override
@@ -15,7 +17,7 @@ class _CreatePostPageState extends State<CreatePostPage> {
   final TextEditingController _postController = TextEditingController();
   Uint8List? _selectedImageBytes;
   File? _selectedImageFile;
-  String _selectedCategory = "401"; // Default as string
+  String _selectedCategory = "401";
   bool _isSubmitting = false;
   String? _userId;
 
@@ -81,7 +83,7 @@ class _CreatePostPageState extends State<CreatePostPage> {
       _isSubmitting = true;
     });
 
-    final int? categoryId = int.tryParse(_selectedCategory); // Convert to int
+    final int? categoryId = int.tryParse(_selectedCategory);
     if (categoryId == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text("Invalid category selected.")),
@@ -94,7 +96,7 @@ class _CreatePostPageState extends State<CreatePostPage> {
 
     final response = await ApiService.createPost(
       _postController.text.trim(),
-      categoryId, // Now an int
+      categoryId,
       _selectedImageFile,
     );
 
@@ -103,10 +105,26 @@ class _CreatePostPageState extends State<CreatePostPage> {
     });
 
     if (response != null && response["message"] == "Post created successfully") {
-      Navigator.pop(context);
+      Map<String, dynamic> post = {
+        "text": _postController.text.trim(),
+        "image": _selectedImageFile?.path ?? "",
+      };
+
+      if (categoryId == 401) {
+        //NearyouPage.posts.add(post);
+      } else if (categoryId == 402) {
+        //EventsPage.posts.add(post);
+      }
+
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text("Post created successfully!")),
       );
+
+      _postController.clear();
+      setState(() {
+        _selectedImageFile = null;
+        _selectedImageBytes = null;
+      });
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text("Failed to create post. Please try again.")),
@@ -138,7 +156,7 @@ class _CreatePostPageState extends State<CreatePostPage> {
                 value: _selectedCategory,
                 items: _categories.map((category) {
                   return DropdownMenuItem<String>(
-                    value: category["id"], // Ensure it's a String
+                    value: category["id"],
                     child: Text(category["name"]!),
                   );
                 }).toList(),
@@ -151,28 +169,6 @@ class _CreatePostPageState extends State<CreatePostPage> {
                 },
                 decoration: InputDecoration(labelText: "Select Category"),
               ),
-              SizedBox(height: 10),
-              _selectedImageBytes != null
-                  ? ClipRRect(
-                      borderRadius: BorderRadius.circular(10),
-                      child: Image.memory(
-                        _selectedImageBytes!,
-                        height: 150,
-                        width: double.infinity,
-                        fit: BoxFit.cover,
-                      ),
-                    )
-                  : _selectedImageFile != null
-                      ? ClipRRect(
-                          borderRadius: BorderRadius.circular(10),
-                          child: Image.file(
-                            _selectedImageFile!,
-                            height: 150,
-                            width: double.infinity,
-                            fit: BoxFit.cover,
-                          ),
-                        )
-                      : Text("No image selected", textAlign: TextAlign.center),
               SizedBox(height: 10),
               ElevatedButton.icon(
                 icon: Icon(Icons.image),
