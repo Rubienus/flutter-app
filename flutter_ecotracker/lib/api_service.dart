@@ -18,19 +18,17 @@ class ApiService {
         'Content-Type': 'application/json',
       });
 
-    if (response.statusCode == 200) {
-      Map<String, dynamic> userData = jsonDecode(response.body);
-      print("User Data Retrieved: ${userData}");
-      return userData;
-    } else {
-      print("Fetch User Failed: ${response.statusCode} - ${response.body}");
+      if (response.statusCode == 200) {
+        return jsonDecode(response.body);
+      } else {
+        print('Fetch User Error: ${response.body}');
+        return null;
+      }
+    } catch (e) {
+      print('Fetch User Exception: $e');
+      return null;
     }
-  } catch (e) {
-    print("Fetch User Exception: $e");
   }
-  return null;
-}
-
 
   // Generic POST request handler
   static Future<Map<String, dynamic>?> postRequest(String url, Map<String, dynamic> data) async {
@@ -42,15 +40,10 @@ class ApiService {
       );
 
       if (response.statusCode == 200) {
-        Map<String, dynamic> responseData = jsonDecode(response.body);
-        if (responseData.containsKey('api_key')) {
-          print("User Registered! API Key: ${responseData['api_key']}");
-          return responseData;
-        } else {
-          print("Error: ${responseData['message']}");
-        }
+        return jsonDecode(response.body);
       } else {
-        print("Request failed with status: ${response.statusCode}");
+        print('Post Request Error: ${response.body}');
+        return null;
       }
     } catch (e) {
       print('Post Request Exception: $e');
@@ -78,9 +71,6 @@ class ApiService {
       'password': password,
     });
   }
-  return null;
-}
-
 
   // Logout user
   static Future<bool> logoutUser() async {
