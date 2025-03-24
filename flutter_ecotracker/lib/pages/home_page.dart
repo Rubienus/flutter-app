@@ -41,46 +41,40 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
-    fetchUserData();
+    fetchUser();
   }
 
-  Future<void> fetchUserData() async {
-    final url = Uri.parse(
-        'https://just1ncantiler0.heliohost.us/Ecotracker_api/script/api.php?username=${widget.apiId}');
+  Future<void> fetchUser() async {
+  print("Fetching user with username: ${widget.apiId}");
 
-    try {
-      final response = await http.get(
-        url,
-        headers: {"Authorization": widget.apiId ?? ''}, // API Key for validation
-      );
-
-      if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
-        setState(() {
-          if (data.containsKey("message")) {
-            username = "User not found";
-            email = "Invalid API Key";
-          } else {
-            username = data['username'];
-            email = data['email'];
-          }
-          isLoading = false;
-        });
-      } else {
-        setState(() {
-          username = "Error fetching data";
-          email = "Check API key";
-          isLoading = false;
-        });
-      }
-    } catch (e) {
-      setState(() {
-        username = "Network error";
-        email = "Please try again";
-        isLoading = false;
-      });
-    }
+  if (widget.apiId == null || widget.apiId!.isEmpty) {
+    setState(() {
+      username = "Invalid Username";
+      email = "Cannot fetch user data";
+      isLoading = false;
+    });
+    return;
   }
+
+  final userData = await ApiService.fetchUser(widget.apiId!);
+
+  if (userData != null) {
+    setState(() {
+      username = userData['username'];
+      email = userData['email'];
+      isLoading = false;
+    });
+  } else {
+    print("Failed to fetch user data. API response was null.");
+    setState(() {
+      username = "User not found";
+      email = "Invalid Username";
+      isLoading = false;
+    });
+  }
+}
+
+
 
   void _onItemTapped(int index) {
     if (index == 1) {
