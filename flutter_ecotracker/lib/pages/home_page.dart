@@ -15,9 +15,9 @@ const secondaryColor = Color(0xFFcbb89d);
 const tertiaryColor = Color(0xFFA1A79E);
 
 class HomePage extends StatefulWidget {
-  final String? apiId;
+  final String? username;
 
-  HomePage({this.apiId});
+  HomePage({this.username});
 
   @override
   _HomePageState createState() => _HomePageState();
@@ -41,25 +41,26 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
-    fetchUserData();
+    fetchUser();
   }
 
-  Future<void> fetchUserData() async {
+  Future<void> fetchUser() async {
     final url = Uri.parse(
-        'https://just1ncantiler0.heliohost.us/Ecotracker_api/script/api.php?username=${widget.apiId}');
+        'https://just1ncantiler0.heliohost.us/Ecotracker_api/api/microuser/crud/read.php?username=${widget.username}');
 
     try {
-      final response = await http.get(
-        url,
-        headers: {"Authorization": widget.apiId ?? ''}, // API Key for validation
-      );
+      final response = await http.get(url);
+
+      print("Fetching user with username: ${widget.username}");
+      print("Response Code: ${response.statusCode}");
+      print("Response Body: ${response.body}");
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
         setState(() {
           if (data.containsKey("message")) {
             username = "User not found";
-            email = "Invalid API Key";
+            email = "No email available";
           } else {
             username = data['username'];
             email = data['email'];
@@ -69,11 +70,12 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
       } else {
         setState(() {
           username = "Error fetching data";
-          email = "Check API key";
+          email = "Check API response";
           isLoading = false;
         });
       }
     } catch (e) {
+      print("Network error: $e");
       setState(() {
         username = "Network error";
         email = "Please try again";
@@ -84,7 +86,6 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
 
   void _onItemTapped(int index) {
     if (index == 1) {
-      // Navigate to CreatePostPage when clicking "Post"
       Navigator.push(
         context,
         MaterialPageRoute(builder: (context) => CreatePostPage()),
@@ -93,6 +94,20 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
       setState(() {
         _selectedIndex = index;
       });
+    }
+  }
+
+  Future<void> _logout() async {
+    bool success = await ApiService.logoutUser();
+    if (success) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => LoginPage()),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Logout failed, try again!')),
+      );
     }
   }
 
@@ -186,19 +201,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
             ),
             ListTile(
               title: Text('Logout'),
-              onTap: () async {
-                bool success = await ApiService.logoutUser(widget.apiId ?? '');
-                if (success) {
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(builder: (context) => LoginPage()),
-                  );
-                } else {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('Logout failed, try again!')),
-                  );
-                }
-              },
+              onTap: _logout,
             ),
           ],
         ),

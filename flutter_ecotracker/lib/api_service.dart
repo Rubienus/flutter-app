@@ -3,16 +3,18 @@ import 'dart:io';
 import 'package:http/http.dart' as http;
 
 class ApiService {
-  static const String baseUrl = "https://just1ncantiler0.heliohost.us/Ecotracker_api/script/api.php";
-  static const String logoutUrl = "https://just1ncantiler0.heliohost.us/Ecotracker_api/logout.php";
-  static const String postUrl = "https://just1ncantiler0.heliohost.us/Ecotracker_api/api/method.php/api/posts/crud/create";
+  static const String baseUrl = "https://just1ncantiler0.heliohost.us/Ecotracker_api";
+  static const String fetchUserUrl = "$baseUrl/api/microuser/crud/read.php";
+  static const String registerUrl = "$baseUrl/api/microuser/register.php";
+  static const String loginUrl = "$baseUrl/api/microuser/login.php";
+  static const String postUrl = "$baseUrl/api/posts/crud/create.php";
+  static const String logoutUrl = "$baseUrl/logout.php";
 
   // Fetch user data (GET)
-  static Future<Map<String, dynamic>?> fetchUser(String username, String apiKey) async {
+  static Future<Map<String, dynamic>?> fetchUser(String username) async {
     try {
-      final url = Uri.parse('$baseUrl?username=$username');
+      final url = Uri.parse('$fetchUserUrl?username=$username');
       final response = await http.get(url, headers: {
-        'Authorization': apiKey,
         'Content-Type': 'application/json',
       });
 
@@ -28,13 +30,13 @@ class ApiService {
     }
   }
 
-  // Send data (POST)
-  static Future<Map<String, dynamic>?> postRequest(String action, Map<String, String> data) async {
+  // Generic POST request handler
+  static Future<Map<String, dynamic>?> postRequest(String url, Map<String, dynamic> data) async {
     try {
       final response = await http.post(
-        Uri.parse(baseUrl),
+        Uri.parse(url),
         headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({'action': action, ...data}),
+        body: jsonEncode(data),
       );
 
       if (response.statusCode == 200) {
@@ -50,26 +52,30 @@ class ApiService {
   }
 
   // Register user
-  static Future<Map<String, dynamic>?> registerUser(String email, String username, String password) async {
-    return await postRequest('register', {
+  static Future<Map<String, dynamic>?> registerUser(
+      String email, String username, String password,
+      {String roles = 'user', String userStatus = 'active'}) async {
+    return await postRequest(registerUrl, {
       'email': email,
       'username': username,
       'password': password,
+      'roles': roles,
+      'user_status': userStatus,
     });
   }
 
   // Login user
   static Future<Map<String, dynamic>?> loginUser(String username, String password) async {
-    return await postRequest('login', {
+    return await postRequest(loginUrl, {
       'username': username,
       'password': password,
     });
   }
 
   // Logout user
-  static Future<bool> logoutUser(String apiKey) async {
+  static Future<bool> logoutUser() async {
     try {
-      final response = await http.post(Uri.parse(logoutUrl), headers: {'Authorization': apiKey});
+      final response = await http.post(Uri.parse(logoutUrl), headers: {'Content-Type': 'application/json'});
 
       if (response.statusCode == 200) {
         return true;

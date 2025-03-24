@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 class CouponsPage extends StatelessWidget {
   const CouponsPage({super.key});
 
-  @override
+   @override
   Widget build(BuildContext context) {
     final List<Map<String, String>> coupons = [
       {"title": "Coupons1", "subtitle": "10pcs Yumburger"},
