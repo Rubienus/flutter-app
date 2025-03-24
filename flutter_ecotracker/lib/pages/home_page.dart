@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
 import 'nearyou_page.dart';
 import 'events_page.dart';
 import 'notifications_page.dart';
@@ -42,48 +40,47 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
     fetchUser();
-    fetchUser();
   }
 
   Future<void> fetchUser() async {
-    final url = Uri.parse(
-        'https://just1ncantiler0.heliohost.us/Ecotracker_api/api/microuser/crud/read.php?username=${widget.username}');
-
-    try {
-      final response = await http.get(url);
-
-      print("Fetching user with username: ${widget.username}");
-      print("Response Code: ${response.statusCode}");
-      print("Response Body: ${response.body}");
-
-      if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
-        setState(() {
-          if (data.containsKey("message")) {
-            username = "User not found";
-            email = "No email available";
-          } else {
-            username = data['username'];
-            email = data['email'];
-          }
-          isLoading = false;
-        });
-      } else {
-        setState(() {
-          username = "Error fetching data";
-          email = "Check API response";
-          isLoading = false;
-        });
-      }
-    } catch (e) {
-      print("Network error: $e");
-      setState(() {
-        username = "Network error";
-        email = "Please try again";
-        isLoading = false;
-      });
-    }
+  if (widget.username == null || widget.username!.isEmpty) {
+    if (!mounted) return;
+    setState(() {
+      username = "Guest";
+      email = "No email available";
+      isLoading = false;
+    });
+    return;
   }
+
+  try {
+    final data = await ApiService.fetchUser(widget.username!);
+    print("Fetching user with username: ${widget.username}");
+
+    if (!mounted) return; // Check if the widget is still mounted
+
+    setState(() {
+      if (data == null || data.containsKey("message")) {
+        username = "User not found";
+        email = "No email available";
+      } else {
+        username = data['username'] ?? "Unknown";
+        email = data['user_email'] ?? "No email available";
+      }
+      isLoading = false;
+    });
+  } catch (e) {
+    print("Network error: $e");
+    if (!mounted) return; // Prevent calling setState if the widget is disposed
+
+    setState(() {
+      username = "Network error";
+      email = "Please try again";
+      isLoading = false;
+    });
+  }
+}
+
 
   void _onItemTapped(int index) {
     if (index == 1) {
@@ -99,18 +96,23 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
   }
 
   Future<void> _logout() async {
-    bool success = await ApiService.logoutUser();
-    if (success) {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => LoginPage()),
-      );
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Logout failed, try again!')),
-      );
-    }
+  bool success = await ApiService.logoutUser();
+
+  if (success) {
+    setState(() {
+      username = "Guest";  // Reset user data
+      email = "No email available";
+    });
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('You have successfully logged out')),
+    );
+  } else {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Logout failed, try again!')),
+    );
   }
+}
 
   @override
   Widget build(BuildContext context) {
@@ -186,9 +188,11 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
               title: Text('Profile'),
               onTap: () {
                 Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => ProfilePage()),
-                );
+  context,
+  MaterialPageRoute(
+    builder: (context) => ProfilePage(username: username),
+  ),
+);
               },
             ),
             ListTile(

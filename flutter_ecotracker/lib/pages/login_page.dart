@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_ecotracker/pages/home_page.dart';
 import '../api_service.dart'; // Import ApiService
 import 'register_page.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginPage extends StatefulWidget {
   @override
@@ -12,19 +13,41 @@ class _LoginPageState extends State<LoginPage> {
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   String? _errorMessage;
+  bool _isLoading = false;
 
   Future<void> login() async {
+    setState(() {
+      _isLoading = true;
+      _errorMessage = null;
+    });
+
     final response = await ApiService.loginUser(
       _usernameController.text,
       _passwordController.text,
     );
 
-print("API Response: $response"); // Debugging
+    setState(() {
+      _isLoading = false;
+    });
 
-if (response != null && response.containsKey("message") && response["message"].toLowerCase().contains("login successful")) {
+    print("API Response: $response"); // Debugging
+
+    if (response != null &&
+        response.containsKey("message") &&
+        response["message"].toLowerCase().contains("login successful")) {
+      
+      // Fetch user details after login
+      final userData = await ApiService.fetchUser(_usernameController.text);
+      if (userData != null && userData.containsKey('user_id')) {
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        await prefs.setString('user_id', userData['user_id'].toString());
+      }
+      
       Navigator.pushReplacement(
-        context, 
-        MaterialPageRoute(builder: (context) => HomePage()),
+        context,
+        MaterialPageRoute(
+            builder: (context) =>
+                HomePage(username: _usernameController.text)),
       );
     } else {
       setState(() {
@@ -52,21 +75,26 @@ if (response != null && response.containsKey("message") && response["message"].t
               obscureText: true,
             ),
             SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: login,
-              child: Text("Login"),
-            ),
+            _isLoading
+                ? CircularProgressIndicator()
+                : ElevatedButton(
+                    onPressed: login,
+                    child: Text("Login"),
+                  ),
             TextButton(
               onPressed: () {
                 Navigator.push(
-                  context, 
+                  context,
                   MaterialPageRoute(builder: (context) => RegisterPage()),
                 );
               },
               child: Text("Don't have an account? Register here"),
             ),
-            if (_errorMessage != null) 
-              Text(_errorMessage!, style: TextStyle(color: Colors.red)),
+            if (_errorMessage != null)
+              Text(
+                _errorMessage!,
+                style: TextStyle(color: Colors.red),
+              ),
           ],
         ),
       ),
