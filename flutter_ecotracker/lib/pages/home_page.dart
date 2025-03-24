@@ -42,6 +42,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
     fetchUser();
+    fetchUser();
   }
 
   Future<void> fetchUser() async {
