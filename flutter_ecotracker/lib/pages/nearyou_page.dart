@@ -72,9 +72,13 @@ class _NearyouPageState extends State<NearyouPage> {
                             Row(
                               children: <Widget>[
                                 CircleAvatar(
-                                  backgroundImage: post['image_url'] != null && post['image_url'].isNotEmpty
-                                      ? NetworkImage('https://just1ncantiler0.heliohost.us/Ecotracker_api/${post['image_url']}')
-                                      : const AssetImage('images/profile_sample.jpg') as ImageProvider,
+                                  backgroundImage: post['image_url'] != null &&
+                                          post['image_url'].isNotEmpty
+                                      ? NetworkImage(
+                                          'https://just1ncantiler0.heliohost.us/Ecotracker_api/${post['image_url']}')
+                                      : const AssetImage(
+                                              'images/profile_sample.jpg')
+                                          as ImageProvider,
                                 ),
                                 const SizedBox(width: 10),
                                 Text(post['username'] ?? 'Unknown User'),
@@ -82,6 +86,14 @@ class _NearyouPageState extends State<NearyouPage> {
                             ),
                             const SizedBox(height: 10),
                             Text(post['title'] ?? 'No content'),
+                            if (post['category_name'] != null)
+                              Text(
+                                'Category: ${post['category_name']}',
+                                style: TextStyle(
+                                  color: Colors.blueGrey[600],
+                                  fontStyle: FontStyle.italic,
+                                ),
+                              ),
                             Text(
                               '${post['points'] ?? 0} Ecopoints',
                               style: const TextStyle(
@@ -90,7 +102,8 @@ class _NearyouPageState extends State<NearyouPage> {
                               ),
                             ),
                             const SizedBox(height: 10),
-                            if (post['image_url'] != null && post['image_url'].isNotEmpty)
+                            if (post['image_url'] != null &&
+                                post['image_url'].isNotEmpty)
                               SizedBox(
                                 height: 200,
                                 child: Image.network(
@@ -112,7 +125,9 @@ class _NearyouPageState extends State<NearyouPage> {
                                     children: <Widget>[
                                       Icon(
                                         Icons.thumb_up,
-                                        color: liked[index] ? Colors.blue : Colors.grey,
+                                        color: liked[index]
+                                            ? Colors.blue
+                                            : Colors.grey,
                                       ),
                                       const SizedBox(width: 5),
                                       const Text('Like'),

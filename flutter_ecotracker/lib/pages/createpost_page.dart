@@ -19,14 +19,13 @@ class _CreatePostPageState extends State<CreatePostPage> {
   String? _userId;
 
   final List<Map<String, String>> _categories = [
-    /*{"id": "401", "name": "near you"},
-    {"id": "402", "name": "Events"},*/
-    {"name": "Residential Area"},
-    {"name": "Beach & Coastal"},
-    {"name": "Public Space Cleaning"},
-    {"name": "Urban & Institutional Clean-Up"},
-    {"name": "Forest & Mountain Clean-Up"},
-    
+    {"id": "401", "name": "near you"},
+    {"id": "402", "name": "Events"},
+    {"id": "403", "name": "Residential Area"},
+    {"id": "404", "name": "Beach & Coastal"},
+    {"id": "405", "name": "Public Space Cleaning"},
+    {"id": "406", "name": "Urban & Institutional Clean-Up"},
+    {"id": "407", "name": "Forest & Mountain Clean-Up"},
   ];
 
   @override
@@ -43,7 +42,8 @@ class _CreatePostPageState extends State<CreatePostPage> {
   }
 
   Future<void> _pickImage() async {
-    final pickedFile = await ImagePicker().pickImage(source: ImageSource.gallery);
+    final pickedFile =
+        await ImagePicker().pickImage(source: ImageSource.gallery);
     if (pickedFile != null) {
       if (kIsWeb) {
         final bytes = await pickedFile.readAsBytes();
@@ -102,19 +102,18 @@ class _CreatePostPageState extends State<CreatePostPage> {
 
     if (response != null && response['status'] == 'success') {
       final pointsEarned = response['points_earned'] ?? 0;
-      
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text("Post created successfully! You earned $pointsEarned Ecopoints!"),
-        ),
-      );
 
+      // Save notification locally
+      final prefs = await SharedPreferences.getInstance();
+      final currentNotifs = prefs.getStringList('local_notifications') ?? [];
+      currentNotifs.add('Earned $pointsEarned points for your post!');
+      await prefs.setStringList('local_notifications', currentNotifs);
       _postController.clear();
       setState(() {
         _selectedImageFile = null;
         _selectedImageBytes = null;
       });
-      
+
       // Optional: Navigate back or refresh posts
       Navigator.pop(context, true);
     } else {

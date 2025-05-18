@@ -4,7 +4,8 @@ import 'dart:convert';
 import 'dart:io';
 
 class ApiService {
-  static const String baseUrl = "https://just1ncantiler0.heliohost.us/Ecotracker_api";
+  static const String baseUrl =
+      "https://just1ncantiler0.heliohost.us/Ecotracker_api";
 
   // User endpoints
   static const String registerUrl = "$baseUrl/api/microuser/register.php";
@@ -282,6 +283,22 @@ class ApiService {
     } catch (e) {
       print('Delete Post Exception: $e');
       return false;
+    }
+  }
+
+  static Future<Map<String, dynamic>?> fetchUserNotifications(
+      String userId) async {
+    try {
+      final url = Uri.parse('$baseUrl/api/notifications?user_id=$userId');
+      final response = await http.get(url);
+
+      if (response.statusCode == 200) {
+        return jsonDecode(response.body);
+      }
+      return null;
+    } catch (e) {
+      print('Fetch Notifications Error: $e');
+      return null;
     }
   }
 }
