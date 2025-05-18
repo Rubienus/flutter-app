@@ -1,12 +1,9 @@
 import 'dart:io';
-import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../api_service.dart';
-import 'nearyou_page.dart';
-import 'events_page.dart';
 
 class CreatePostPage extends StatefulWidget {
   @override
@@ -22,8 +19,14 @@ class _CreatePostPageState extends State<CreatePostPage> {
   String? _userId;
 
   final List<Map<String, String>> _categories = [
-    {"id": "401", "name": "Near You"},
-    {"id": "402", "name": "Events"},
+    /*{"id": "401", "name": "near you"},
+    {"id": "402", "name": "Events"},*/
+    {"name": "Residential Area"},
+    {"name": "Beach & Coastal"},
+    {"name": "Public Space Cleaning"},
+    {"name": "Urban & Institutional Clean-Up"},
+    {"name": "Forest & Mountain Clean-Up"},
+    
   ];
 
   @override
@@ -65,13 +68,6 @@ class _CreatePostPageState extends State<CreatePostPage> {
       return;
     }
 
-    if (_selectedImageFile == null && _selectedImageBytes == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Please select an image before posting.")),
-      );
-      return;
-    }
-
     if (_userId == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text("User ID not found. Please log in again.")),
@@ -104,20 +100,13 @@ class _CreatePostPageState extends State<CreatePostPage> {
       _isSubmitting = false;
     });
 
-    if (response != null && response["message"] == "Post created successfully") {
-      Map<String, dynamic> post = {
-        "text": _postController.text.trim(),
-        "image": _selectedImageFile?.path ?? "",
-      };
-
-      if (categoryId == 401) {
-        //NearyouPage.posts.add(post);
-      } else if (categoryId == 402) {
-        //EventsPage.posts.add(post);
-      }
-
+    if (response != null && response['status'] == 'success') {
+      final pointsEarned = response['points_earned'] ?? 0;
+      
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Post created successfully!")),
+        SnackBar(
+          content: Text("Post created successfully! You earned $pointsEarned Ecopoints!"),
+        ),
       );
 
       _postController.clear();
@@ -125,9 +114,13 @@ class _CreatePostPageState extends State<CreatePostPage> {
         _selectedImageFile = null;
         _selectedImageBytes = null;
       });
+      
+      // Optional: Navigate back or refresh posts
+      Navigator.pop(context, true);
     } else {
+      final errorMessage = response?['message'] ?? "Failed to create post";
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Failed to create post. Please try again.")),
+        SnackBar(content: Text(errorMessage)),
       );
     }
   }
@@ -170,12 +163,21 @@ class _CreatePostPageState extends State<CreatePostPage> {
                 decoration: InputDecoration(labelText: "Select Category"),
               ),
               SizedBox(height: 10),
+              if (_selectedImageFile != null || _selectedImageBytes != null)
+                Column(
+                  children: [
+                    kIsWeb
+                        ? Image.memory(_selectedImageBytes!, height: 200)
+                        : Image.file(_selectedImageFile!, height: 200),
+                    SizedBox(height: 10),
+                  ],
+                ),
               ElevatedButton.icon(
                 icon: Icon(Icons.image),
                 label: Text("Pick Image"),
                 onPressed: _pickImage,
               ),
-              SizedBox(height: 10),
+              SizedBox(height: 20),
               _isSubmitting
                   ? Center(child: CircularProgressIndicator())
                   : ElevatedButton(
