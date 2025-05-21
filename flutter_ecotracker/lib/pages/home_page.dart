@@ -138,7 +138,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                 labelColor: Colors.white,
                 indicatorColor: Colors.white,
                 tabs: const [
-                  Tab(text: 'Near You'),
+                  Tab(text: 'In your City'),
                   Tab(text: 'Events'),
                 ],
               )
