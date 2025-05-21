@@ -75,7 +75,7 @@ class _NearyouPageState extends State<NearyouPage> {
                                   backgroundImage: post['image_url'] != null &&
                                           post['image_url'].isNotEmpty
                                       ? NetworkImage(
-                                          'https://just1ncantiler0.heliohost.us/Ecotracker_api/${post['image_url']}')
+                                          'https://just1ncantiler0.heliohost.us/Ecotracker_api/api/posts/uploads/${post['image_url']}')
                                       : const AssetImage(
                                               'images/profile_sample.jpg')
                                           as ImageProvider,
@@ -88,7 +88,7 @@ class _NearyouPageState extends State<NearyouPage> {
                             Text(post['title'] ?? 'No content'),
                             if (post['category_name'] != null)
                               Text(
-                                'Category: ${post['category_name']}',
+                                '${post['category_name']}',
                                 style: TextStyle(
                                   color: Colors.blueGrey[600],
                                   fontStyle: FontStyle.italic,
@@ -104,12 +104,36 @@ class _NearyouPageState extends State<NearyouPage> {
                             const SizedBox(height: 10),
                             if (post['image_url'] != null &&
                                 post['image_url'].isNotEmpty)
-                              SizedBox(
-                                height: 200,
-                                child: Image.network(
-                                  'https://just1ncantiler0.heliohost.us/Ecotracker_api/${post['image_url']}',
-                                  fit: BoxFit.cover,
-                                ),
+                              Column(
+                                children: [
+                                  SizedBox(
+                                    height: 200,
+                                    child: Image.network(
+                                      'https://just1ncantiler0.heliohost.us/Ecotracker_api/api/posts/uploads/${post['image_url']}',
+                                      fit: BoxFit.cover,
+                                      loadingBuilder:
+                                          (context, child, loadingProgress) {
+                                        if (loadingProgress == null)
+                                          return child;
+                                        return Center(
+                                            child: CircularProgressIndicator());
+                                      },
+                                      errorBuilder:
+                                          (context, error, stackTrace) {
+                                        print(
+                                            'Failed to load image: ${post['image_url']}');
+                                        return Icon(Icons.broken_image,
+                                            size: 50);
+                                      },
+                                    ),
+                                  ),
+                                  SizedBox(height: 8),
+                                  Text(
+                                    'Image: ${post['image_url']}',
+                                    style: TextStyle(
+                                        fontSize: 12, color: Colors.grey),
+                                  ),
+                                ],
                               ),
                             const SizedBox(height: 10),
                             Row(

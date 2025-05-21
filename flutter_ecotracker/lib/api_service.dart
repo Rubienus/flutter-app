@@ -113,51 +113,61 @@ class ApiService {
   }
 
   static Future<Map<String, dynamic>?> createPost(
-    String text,
-    int category,
-    File? image, {
-    int? points, // Add this optional parameter
-  }) async {
-    try {
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      String? userId = prefs.getString('user_id');
+  String text,
+  int category,
+  File? image, {
+  int? points,
+}) async {
+  try {
+    print("Starting post creation...");
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? userId = prefs.getString('user_id');
+    print("User ID: $userId");
 
-      if (userId == null) {
-        print("Error: No user ID found.");
-        return {"error": "User not logged in"};
-      }
-
-      var request = http.MultipartRequest('POST', Uri.parse(postUrl));
-      request.fields['user_id'] = userId;
-      request.fields['text'] = text;
-      request.fields['category_id'] = category.toString();
-
-      // Add points if provided
-      if (points != null) {
-        request.fields['points'] = points.toString();
-      }
-
-      if (image != null) {
-        request.files
-            .add(await http.MultipartFile.fromPath('image', image.path));
-      }
-
-      var streamedResponse = await request.send();
-      var response = await http.Response.fromStream(streamedResponse);
-
-      print("Server Response Code: ${response.statusCode}");
-      print("Server Response Body: ${response.body}");
-
-      if (response.statusCode == 200) {
-        return jsonDecode(response.body);
-      } else {
-        return {"error": "Failed to create post"};
-      }
-    } catch (e) {
-      print("Create Post Exception: $e");
-      return {"error": "Exception occurred: $e"};
+    if (userId == null) {
+      print("Error: No user ID found.");
+      return {"error": "User not logged in"};
     }
+
+    var request = http.MultipartRequest('POST', Uri.parse(postUrl));
+    request.fields['user_id'] = userId;
+    request.fields['text'] = text;
+    request.fields['category_id'] = category.toString();
+
+    if (points != null) {
+      request.fields['points'] = points.toString();
+    }
+
+    if (image != null) {
+      print("Adding image to request: ${image.path}");
+      request.files.add(
+        await http.MultipartFile.fromPath(
+          'image', 
+          image.path,
+          filename: 'post_${DateTime.now().millisecondsSinceEpoch}.jpg',
+        ),
+      );
+    } else {
+      print("No image provided");
+    }
+
+    print("Sending request to server...");
+    var streamedResponse = await request.send();
+    var response = await http.Response.fromStream(streamedResponse);
+
+    print("Server Response Code: ${response.statusCode}");
+    print("Server Response Body: ${response.body}");
+
+    if (response.statusCode == 200) {
+      return jsonDecode(response.body);
+    } else {
+      return {"error": "Failed to create post. Status: ${response.statusCode}"};
+    }
+  } catch (e) {
+    print("Create Post Exception: $e");
+    return {"error": "Exception occurred: $e"};
   }
+}
 
 // Fetch Posts (GET)
   static Future<List<Map<String, dynamic>>?> fetchPosts(
