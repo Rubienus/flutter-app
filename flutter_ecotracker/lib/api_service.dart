@@ -343,7 +343,7 @@ static Future<List<Map<String, dynamic>>?> fetchUserNotifications(
 }) async {
   try {
     final response = await http.post(
-      Uri.parse('$baseUrl/api/posts/crus/claim_coupon.php'),
+      Uri.parse('$baseUrl/api/posts/crud/claim_coupon.php'),
       headers: {'Content-Type': 'application/json'},
       body: jsonEncode({
         'user_id': userId,
