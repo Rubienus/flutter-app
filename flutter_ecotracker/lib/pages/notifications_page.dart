@@ -25,36 +25,28 @@ class _NotificationsPageState extends State<NotificationsPage> {
       final userId = prefs.getString('user_id');
       
       if (userId != null) {
-        // Fetch notifications from API
         final response = await ApiService.fetchUserNotifications(userId);
-        
-        if (response != null && response['status'] == 'success') {
-          setState(() {
-            notifications = List<Map<String, dynamic>>.from(response['notifications'] ?? []);
-            isLoading = false;
-          });
-          return;
-        }
+        setState(() {
+          notifications = response ?? [];
+          isLoading = false;
+        });
+      } else {
+        setState(() => isLoading = false);
       }
-      
-      // Fallback to local notifications if API fails
-      final localNotifs = prefs.getStringList('local_notifications') ?? [];
-      setState(() {
-        notifications = localNotifs.map((n) => {'message': n, 'timestamp': DateTime.now().toString()}).toList();
-        isLoading = false;
-      });
     } catch (e) {
-      setState(() {
-        isLoading = false;
-      });
+      setState(() => isLoading = false);
     }
   }
 
-  Future<void> _refreshNotifications() async {
-    setState(() {
-      isLoading = true;
-    });
-    await _loadNotifications();
+  Future<void> _dismissNotification(String notificationId) async {
+    try {
+      // Optionally implement delete functionality if needed
+      setState(() {
+        notifications.removeWhere((n) => n['notification_id'].toString() == notificationId);
+      });
+    } catch (e) {
+      print('Error dismissing notification: $e');
+    }
   }
 
   @override
@@ -65,36 +57,37 @@ class _NotificationsPageState extends State<NotificationsPage> {
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh),
-            onPressed: _refreshNotifications,
+            onPressed: _loadNotifications,
           ),
         ],
       ),
       body: isLoading
           ? const Center(child: CircularProgressIndicator())
           : notifications.isEmpty
-              ? const Center(
-                  child: Text('You have no notifications as of now.'),
-                )
+              ? const Center(child: Text('No notifications yet'))
               : RefreshIndicator(
-                  onRefresh: _refreshNotifications,
+                  onRefresh: _loadNotifications,
                   child: ListView.builder(
                     itemCount: notifications.length,
                     itemBuilder: (context, index) {
                       final notification = notifications[index];
-                      return Card(
-                        margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                        child: ListTile(
-                          leading: const Icon(Icons.eco, color: Colors.green),
-                          title: Text(notification['message'] ?? 'New notification'),
-                          subtitle: Text(
-                            notification['timestamp'] != null
-                                ? _formatTimestamp(notification['timestamp'])
-                                : 'Just now',
-                            style: const TextStyle(fontSize: 12),
-                          ),
-                          trailing: IconButton(
-                            icon: const Icon(Icons.close),
-                            onPressed: () => _dismissNotification(index),
+                      return Dismissible(
+                        key: Key(notification['notification_id'].toString()),
+                        onDismissed: (direction) => 
+                          _dismissNotification(notification['notification_id'].toString()),
+                        background: Container(color: Colors.red),
+                        child: Card(
+                          child: ListTile(
+                            title: Text(notification['message']),
+                            subtitle: Text(
+                              _formatTimestamp(notification['created_at']),
+                              style: const TextStyle(fontSize: 12),
+                            ),
+                            trailing: Icon(
+                              notification['is_read'] == 1 
+                                ? Icons.mark_email_read 
+                                : Icons.mark_email_unread,
+                            ),
                           ),
                         ),
                       );
@@ -107,22 +100,9 @@ class _NotificationsPageState extends State<NotificationsPage> {
   String _formatTimestamp(String timestamp) {
     try {
       final dateTime = DateTime.parse(timestamp);
-      return '${dateTime.hour}:${dateTime.minute.toString().padLeft(2, '0')} - ${dateTime.day}/${dateTime.month}/${dateTime.year}';
+      return '${dateTime.day}/${dateTime.month}/${dateTime.year} ${dateTime.hour}:${dateTime.minute.toString().padLeft(2, '0')}';
     } catch (e) {
       return timestamp;
     }
-  }
-
-  Future<void> _dismissNotification(int index) async {
-    setState(() {
-      notifications.removeAt(index);
-    });
-    
-    // Update local storage if using local notifications
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setStringList(
-      'local_notifications',
-      notifications.map((n) => n['message']).toList().cast<String>(),
-    );
   }
 }

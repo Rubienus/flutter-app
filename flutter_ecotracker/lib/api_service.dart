@@ -16,7 +16,6 @@ class ApiService {
   static const String postUrl = "$baseUrl/api/posts/crud/create.php";
   static const String fetchPostUrl = "$baseUrl/api/posts/crud/read.php";
   static const String deletePostUrl = "$baseUrl/api/posts/crud/delete.php";
-  static const String userPostsUrl = "$baseUrl/api/posts/crud/user_posts.php";
 
   // Fetch user data (GET)
   static Future<Map<String, dynamic>?> fetchUser(String username) async {
@@ -296,19 +295,73 @@ class ApiService {
     }
   }
 
-  static Future<Map<String, dynamic>?> fetchUserNotifications(
-      String userId) async {
-    try {
-      final url = Uri.parse('$baseUrl/api/notifications?user_id=$userId');
-      final response = await http.get(url);
+  // Add these methods to your ApiService class
+static Future<bool> createNotification({
+  required String userId,
+  required String message,
+}) async {
+  try {
+    final response = await http.post(
+      Uri.parse('$baseUrl/api/notifications/create.php'),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({
+        'user_id': userId,
+        'message': message,
+      }),
+    );
 
-      if (response.statusCode == 200) {
-        return jsonDecode(response.body);
-      }
-      return null;
-    } catch (e) {
-      print('Fetch Notifications Error: $e');
-      return null;
-    }
+    return response.statusCode == 200;
+  } catch (e) {
+    print('Create Notification Error: $e');
+    return false;
   }
+}
+
+static Future<List<Map<String, dynamic>>?> fetchUserNotifications(
+    String userId) async {
+  try {
+    final url = Uri.parse('$baseUrl/api/notifications/read.php?user_id=$userId');
+    final response = await http.get(url);
+
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      if (data is List) {
+        return data.cast<Map<String, dynamic>>();
+      }
+    }
+    return [];
+  } catch (e) {
+    print('Fetch Notifications Error: $e');
+    return [];
+  }
+}
+
+  static Future<bool> claimCoupon({
+  required String userId,
+  required int couponId,
+  required int points,
+}) async {
+  try {
+    final response = await http.post(
+      Uri.parse('$baseUrl/api/posts/crus/claim_coupon.php'),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({
+        'user_id': userId,
+        'coupon_id': couponId,
+        'points': points,
+      }),
+    );
+
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      return data['status'] == 'success';
+    }
+    return false;
+  } catch (e) {
+    print('Claim Coupon Error: $e');
+    return false;
+  }
+}
+
+
 }
