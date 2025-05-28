@@ -103,7 +103,7 @@ class _NearyouPageState extends State<NearyouPage> {
                             ),
                             const SizedBox(height: 10),
                             if (post['image_url'] != null &&
-                                post['image_url'].isNotEmpty)
+                                post['image_url'].toString().isNotEmpty)
                               Column(
                                 children: [
                                   SizedBox(
@@ -121,17 +121,10 @@ class _NearyouPageState extends State<NearyouPage> {
                                       errorBuilder:
                                           (context, error, stackTrace) {
                                         print(
-                                            'Failed to load image: ${post['image_url']}');
-                                        return Icon(Icons.broken_image,
-                                            size: 50);
+                                            'Failed to load image: ${post['image_url']} - Error: $error');
+                                        return Container(); // Return empty container instead of broken image icon
                                       },
                                     ),
-                                  ),
-                                  SizedBox(height: 8),
-                                  Text(
-                                    'Image: ${post['image_url']}',
-                                    style: TextStyle(
-                                        fontSize: 12, color: Colors.grey),
                                   ),
                                 ],
                               ),

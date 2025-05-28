@@ -6,6 +6,17 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../api_service.dart';
 
 class CreatePostPage extends StatefulWidget {
+  final String? initialText;
+  final String? initialCategory;
+  final int? postId;
+
+  const CreatePostPage({
+    Key? key,
+    this.initialText,
+    this.initialCategory,
+    this.postId,
+  }) : super(key: key);
+
   @override
   _CreatePostPageState createState() => _CreatePostPageState();
 }
@@ -14,13 +25,14 @@ class _CreatePostPageState extends State<CreatePostPage> {
   final TextEditingController _postController = TextEditingController();
   Uint8List? _selectedImageBytes;
   File? _selectedImageFile;
-  String _selectedCategory = "401";
+  String _selectedCategory = "403";
   bool _isSubmitting = false;
   String? _userId;
+  int? _postId;
 
   final List<Map<String, String>> _categories = [
-    {"id": "401", "name": "near you"},
-    {"id": "402", "name": "Events"},
+    /*{"id": "401", "name": "near you"},
+    {"id": "402", "name": "Events"},*/
     {"id": "403", "name": "Residential Area"},
     {"id": "404", "name": "Beach & Coastal"},
     {"id": "405", "name": "Public Space Cleaning"},
@@ -32,6 +44,14 @@ class _CreatePostPageState extends State<CreatePostPage> {
   void initState() {
     super.initState();
     _loadUserId();
+  
+  if (widget.initialText != null) {
+      _postController.text = widget.initialText!;
+    }
+    if (widget.initialCategory != null) {
+      _selectedCategory = widget.initialCategory!;
+    }
+    _postId = widget.postId;
   }
 
   Future<void> _loadUserId() async {
@@ -61,68 +81,78 @@ class _CreatePostPageState extends State<CreatePostPage> {
   }
 
   Future<void> _submitPost() async {
-    if (_postController.text.trim().isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Please enter some text before posting.")),
-      );
-      return;
-    }
-
-    if (_userId == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("User ID not found. Please log in again.")),
-      );
-      return;
-    }
-
-    setState(() {
-      _isSubmitting = true;
-    });
-
-    final int? categoryId = int.tryParse(_selectedCategory);
-    if (categoryId == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Invalid category selected.")),
-      );
-      setState(() {
-        _isSubmitting = false;
-      });
-      return;
-    }
-
-    final response = await ApiService.createPost(
-      _postController.text.trim(),
-      categoryId,
-      _selectedImageFile,
+  if (_postController.text.trim().isEmpty) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text("Please enter some text before posting.")),
     );
+    return;
+  }
 
+  if (_userId == null) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text("User ID not found. Please log in again.")),
+    );
+    return;
+  }
+
+  setState(() {
+    _isSubmitting = true;
+  });
+
+  final int? categoryId = int.tryParse(_selectedCategory);
+  if (categoryId == null) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text("Invalid category selected.")),
+    );
     setState(() {
       _isSubmitting = false;
     });
+    return;
+  }
 
-    if (response != null && response['status'] == 'success') {
-      final pointsEarned = response['points_earned'] ?? 0;
+  final response = _postId == null
+      ? await ApiService.createPost(
+          _postController.text.trim(),
+          categoryId,
+          _selectedImageFile,
+        )
+      : await ApiService.updatePost(
+          _postId!,
+          _postController.text.trim(),
+          categoryId,
+          _selectedImageFile,
+        );
 
+  setState(() {
+    _isSubmitting = false;
+  });
+
+  if (response != null && response['status'] == 'success') {
+    final pointsEarned = response['points_earned'] ?? 0;
+
+    if (pointsEarned > 0) {
       // Save notification locally
       final prefs = await SharedPreferences.getInstance();
       final currentNotifs = prefs.getStringList('local_notifications') ?? [];
       currentNotifs.add('Earned $pointsEarned points for your post!');
       await prefs.setStringList('local_notifications', currentNotifs);
-      _postController.clear();
-      setState(() {
-        _selectedImageFile = null;
-        _selectedImageBytes = null;
-      });
-
-      // Optional: Navigate back or refresh posts
-      Navigator.pop(context, true);
-    } else {
-      final errorMessage = response?['message'] ?? "Failed to create post";
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(errorMessage)),
-      );
     }
+
+    _postController.clear();
+    setState(() {
+      _selectedImageFile = null;
+      _selectedImageBytes = null;
+    });
+
+    // Return true to indicate success
+    Navigator.pop(context, true);
+  } else {
+    final errorMessage = response?['message'] ?? "Failed to ${_postId == null ? 'create' : 'update'} post";
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(errorMessage)),
+    );
   }
+}
 
   @override
   Widget build(BuildContext context) {

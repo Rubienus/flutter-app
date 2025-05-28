@@ -16,21 +16,21 @@ class _CouponsPageState extends State<CouponsPage> {
       "subtitle": "Get 10% discount on eco-friendly products",
       "points": 50,
       "code": "ECO10",
-      "coupon_id": 601
+      "coupon_id": 1 // Matches the coupon_id in your database
     },
     {
       "title": "Free Reusable Bag",
       "subtitle": "Claim your free reusable shopping bag",
       "points": 100,
       "code": "BAGFREE",
-      "coupon_id": 602
+      "coupon_id": 2 // Matches the coupon_id in your database
     },
     {
       "title": "Buy 1 Take 1 Coffee",
       "subtitle": "Buy one coffee, get one free at EcoCafe",
       "points": 75,
       "code": "B1T1COFFEE",
-      "coupon_id": 603
+      "coupon_id": 3 // Matches the coupon_id in your database
     },
   ];
 
@@ -121,12 +121,6 @@ class _CouponsPageState extends State<CouponsPage> {
       setState(() {
         userPoints -= requiredPoints;
       });
-
-      // Send notification
-      await ApiService.createNotification(
-        userId: userId!,
-        message: 'You claimed "${coupon['title']}" for $requiredPoints points! Code: ${coupon['code']}',
-      );
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -245,7 +239,8 @@ class _CouponsPageState extends State<CouponsPage> {
                               ),
                             ],
                           ),
-                          trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+                          trailing:
+                              const Icon(Icons.arrow_forward_ios, size: 16),
                           onTap: () => _claimCoupon(index),
                         ),
                       );
